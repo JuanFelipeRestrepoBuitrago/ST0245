@@ -1,24 +1,69 @@
 import pandas as pd
 import math
-import queue
+from collections import deque
 
 
 # This method finds the vertex of the graph with the lowest distance
 # of all vertexes that are in unvisited
-def find_the_lowest_distance(unvisited: queue, distances: dict):
+def find_the_lowest_distance(unvisited: deque, distances: dict):
     lowest_key = ""
     lowest = math.inf
 
     for node in unvisited:
-        if distances[node] < lowest:
+        if distances[node][0] < lowest:
             lowest_key = node
-            lowest = distances[node]
+            lowest = distances[node][0]
 
+    unvisited.remove(lowest_key)
     return lowest_key
 
 
-def dijkstra_distance(graph: dict, start: str, end: str):
-    pass
+# This method generates the necessary dictionaries to run dijkstra's algorithm
+def generate_necessary_dictionaries(graph, start_node):
+    distances = {}
+    unvisited = deque()
+    predecessor = {}
+    for key in graph:
+        distances[key] = [math.inf, 0, 0]
+        unvisited.append(key)
+        predecessor[key] = None
+
+    distances[start_node][0] = 0
+    return distances, unvisited, predecessor
+
+
+# This method generates the path from the start node to the end node
+def generate_path(predecessor, end):
+    path = deque()
+    path.append(end)
+    current = end
+
+    while current is not None:
+        path.appendleft(predecessor[current])
+        current = predecessor[current]
+
+    return list(path)
+
+
+# This method finds the shortest path from a start node to a destination node
+# using Dijkstra's algorithm
+def shortest_path(graph: dict, start, end):
+    distances, unvisited, predecessor = generate_necessary_dictionaries(graph, start)
+
+    while unvisited:
+        current_node = find_the_lowest_distance(unvisited, distances)
+
+        if current_node == end:
+            break
+        for adjacent_node in graph[current_node]:
+            if adjacent_node in unvisited:
+                distance = distances[current_node][0] + graph[current_node][adjacent_node][0]
+                if distance < distances[adjacent_node][0]:
+                    distances[adjacent_node][0], distances[adjacent_node][1] = distance, graph[current_node][
+                        adjacent_node][1] + distances[current_node][1]
+                    predecessor[adjacent_node] = current_node
+
+    return generate_path(predecessor, end), distances[end][0], distances[end][1]
 
 
 def generate_graph():
@@ -63,8 +108,10 @@ def generate_graph():
 
 def main():
     graph = generate_graph()
-    print(graph)
-    print(len(graph))
+
+    path, distance, risk = shortest_path(graph, list(graph.keys())[0], list(graph.keys())[1])
+
+    print(path, round(distance, 2), round(risk, 2))
 
 
 main()
