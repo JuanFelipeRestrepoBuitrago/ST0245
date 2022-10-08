@@ -38,7 +38,7 @@ def generate_path(predecessor, end):
     path.append(end)
     current = end
 
-    while current is not None:
+    while predecessor[current] is not None:
         path.appendleft(predecessor[current])
         current = predecessor[current]
 
@@ -90,17 +90,20 @@ def generate_graph():
 
         origin = (float(origin[1]), float(origin[0]))
         destination = (float(destination[1]), float(destination[0]))
+        weight = (float(data["length"][i]), float(data["harassmentRisk"][i]), (
+                (float(data["length"][i]) + float(data["harassmentRisk"][i])) / 2
+            ))
 
         if origin not in graph:
             graph[origin] = {}
         # Add the adjacent street of each dictionary in the graph.
-        graph[origin][destination] = (float(data["length"][i]), float(data["harassmentRisk"][i]))
+        graph[origin][destination] = weight
 
         if data["oneway"][i]:
             if destination not in graph:
                 graph[destination] = {}
             # Add the adjacent street of each dictionary in the graph.
-            graph[destination][origin] = (float(data["length"][i]), float(data["harassmentRisk"][i]))
+            graph[destination][origin] = weight
 
     del data
     return graph
@@ -109,10 +112,9 @@ def generate_graph():
 def main():
     graph = generate_graph()
 
-    path, distance, risk = shortest_path(graph, list(graph.keys())[0], list(graph.keys())[1])
+    path, distance, risk = shortest_path(graph, list(graph.keys())[0], list(graph.keys())[142])
 
-    print(path, round(distance, 2), round(risk, 2))
+    print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
 
 
 main()
-
