@@ -29,8 +29,7 @@ def generate_necessary_dictionaries(graph: dict, start_node):
         distances[key] = [math.inf, math.inf, math.inf]
         predecessor[key] = None
 
-    distances[start_node][0] = float(0)
-    distances[start_node][1] = float(0)
+    distances[start_node] = [float(0), float(0), float(0)]
     return distances, visited, predecessor
 
 
@@ -95,6 +94,30 @@ def safest_path(graph: dict, start, end):
     return generate_path(predecessor, end), distances[end][0], distances[end][1]
 
 
+def safe_short_path(graph: dict, start, end):
+    distances, visited, predecessor = generate_necessary_dictionaries(graph, start)
+    min_distance = [(distances[start][2], distances[start][1], distances[start][0], start)]
+
+    while min_distance:
+        melted, risk, distance, current_node = heapq.heappop(min_distance)
+
+        if current_node == end:
+            break
+        if current_node in visited:
+            continue
+        for adjacent_node in graph[current_node]:
+            if adjacent_node not in visited:
+                adj_melted = melted + graph[current_node][adjacent_node][2]
+                if adj_melted < distances[adjacent_node][2]:
+                    distances[adjacent_node][0], distances[adjacent_node][1], distances[adjacent_node][2] = distance + \
+                        graph[current_node][adjacent_node][0], risk + graph[current_node][adjacent_node][1], melted
+                    predecessor[adjacent_node] = current_node
+                    heapq.heappush(min_distance, (adj_melted, distances[adjacent_node][1], distances[adjacent_node][0],
+                                                  adjacent_node))
+
+    return generate_path(predecessor, end), distances[end][0], distances[end][1]
+
+
 def generate_graph():
     # Read the data from the csv file and store it in a pandas dataframe
     data = pd.read_csv("calles_de_medellin_con_acoso.csv", sep=";")
@@ -140,14 +163,21 @@ def main():
 
     print("Shortest path:")
     time_start = time.time()
-    path, distance, risk = shortest_path(graph, list(graph.keys())[0], list(graph.keys())[2000])
+    path, distance, risk = shortest_path(graph, list(graph.keys())[0], list(graph.keys())[142])
 
     print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
     print("Time: ", str(time.time() - time_start), "seconds")
 
     print("Safest path:")
     time_start = time.time()
-    path, distance, risk = safest_path(graph, list(graph.keys())[0], list(graph.keys())[2000])
+    path, distance, risk = safest_path(graph, list(graph.keys())[0], list(graph.keys())[142])
+
+    print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
+    print("Time: ", str(time.time() - time_start), "seconds")
+
+    print("Safe and Short path:")
+    time_start = time.time()
+    path, distance, risk = safe_short_path(graph, list(graph.keys())[0], list(graph.keys())[142])
 
     print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
     print("Time: ", str(time.time() - time_start), "seconds")
