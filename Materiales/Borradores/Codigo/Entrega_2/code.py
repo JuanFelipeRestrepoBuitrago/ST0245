@@ -1,5 +1,7 @@
+import time
 import pandas as pd
 import math
+import heapq
 from collections import deque
 
 
@@ -19,17 +21,17 @@ def find_the_lowest_distance(unvisited: deque, distances: dict):
 
 
 # This method generates the necessary dictionaries to run dijkstra's algorithm
-def generate_necessary_dictionaries(graph, start_node):
+def generate_necessary_dictionaries(graph: dict, start_node):
     distances = {}
-    unvisited = deque()
+    visited = {}
     predecessor = {}
-    for key in graph:
-        distances[key] = [math.inf, 0, 0]
-        unvisited.append(key)
+    for key in graph.keys():
+        distances[key] = [math.inf, math.inf, math.inf]
         predecessor[key] = None
 
-    distances[start_node][0] = 0
-    return distances, unvisited, predecessor
+    distances[start_node][0] = float(0)
+    distances[start_node][1] = float(0)
+    return distances, visited, predecessor
 
 
 # This method generates the path from the start node to the end node
@@ -48,20 +50,24 @@ def generate_path(predecessor, end):
 # This method finds the shortest path from a start node to a destination node
 # using Dijkstra's algorithm
 def shortest_path(graph: dict, start, end):
-    distances, unvisited, predecessor = generate_necessary_dictionaries(graph, start)
+    distances, visited, predecessor = generate_necessary_dictionaries(graph, start)
+    min_distance = [(distances[start][0], distances[start][1], start)]
 
-    while unvisited:
-        current_node = find_the_lowest_distance(unvisited, distances)
+    while min_distance:
+        distance, risk, current_node = heapq.heappop(min_distance)
 
         if current_node == end:
             break
+        if current_node in visited:
+            continue
         for adjacent_node in graph[current_node]:
-            if adjacent_node in unvisited:
-                distance = distances[current_node][0] + graph[current_node][adjacent_node][0]
-                if distance < distances[adjacent_node][0]:
-                    distances[adjacent_node][0], distances[adjacent_node][1] = distance, graph[current_node][
-                        adjacent_node][1] + distances[current_node][1]
+            if adjacent_node not in visited:
+                adj_dist = distance + graph[current_node][adjacent_node][0]
+                if adj_dist < distances[adjacent_node][0]:
+                    distances[adjacent_node][0], distances[adjacent_node][1] = adj_dist, graph[current_node][
+                        adjacent_node][1] + risk
                     predecessor[adjacent_node] = current_node
+                    heapq.heappush(min_distance, (adj_dist, distances[adjacent_node][1], adjacent_node))
 
     return generate_path(predecessor, end), distances[end][0], distances[end][1]
 
@@ -70,9 +76,7 @@ def generate_graph():
     # Read the data from the csv file and store it in a pandas dataframe
     data = pd.read_csv("calles_de_medellin_con_acoso.csv", sep=";")
 
-    risk_media = data["harassmentRisk"].mean()
-
-    data["harassmentRisk"].fillna(risk_media, inplace=True)
+    data.harassmentRisk.fillna(data.harassmentRisk.mean(), inplace=True)
 
     # Create the graph as a dictionary of dictionaries.
     # The keys of the first dictionary are the origin and
@@ -84,14 +88,14 @@ def generate_graph():
     # of the dataframe and add them to the graph if they
     # are not already there.
 
-    for i in range(len(data)):
+    for i in data.index:
         origin = tuple(data["origin"][i][1:-1].split(","))
         destination = tuple(data["destination"][i][1:-1].split(","))
 
         origin = (float(origin[1]), float(origin[0]))
         destination = (float(destination[1]), float(destination[0]))
-        weight = (float(data["length"][i]), float(data["harassmentRisk"][i]), (
-                (float(data["length"][i]) + float(data["harassmentRisk"][i])) / 2
+        weight = (data["length"][i], data["harassmentRisk"][i], (
+                (data["length"][i] + data["harassmentRisk"][i]) / 2
             ))
 
         if origin not in graph:
@@ -105,16 +109,19 @@ def generate_graph():
             # Add the adjacent street of each dictionary in the graph.
             graph[destination][origin] = weight
 
-    del data
     return graph
 
 
 def main():
     graph = generate_graph()
 
-    path, distance, risk = shortest_path(graph, list(graph.keys())[0], list(graph.keys())[142])
+    time_start = time.time()
+    path, distance, risk = shortest_path(graph, list(graph.keys())[0], list(graph.keys())[2000])
 
     print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
+    print("Time: ", str(time.time() - time_start), "seconds")
 
 
 main()
+
+
