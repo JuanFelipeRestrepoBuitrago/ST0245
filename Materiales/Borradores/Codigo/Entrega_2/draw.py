@@ -74,9 +74,9 @@ def generate_and_save_map(shortest: list=None, safest: list=None, safe_short: li
 
     # Add the paths to the map
     if shortest is not None:
-        generate_paths(shortest, "red", "Shortest", fig)
+        generate_paths(shortest, "whitesmoke", "Shortest", fig)
     if safest is not None:
-        generate_paths(safest, "yellow", "Safest", fig)
+        generate_paths(safest, "aqua", "Safest", fig)
     if safe_short is not None:
         generate_paths(safe_short, "violet", "Safe and Short", fig)
 
