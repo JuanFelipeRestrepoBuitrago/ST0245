@@ -88,6 +88,16 @@ fig.add_trace(go.Scattermapbox(
         text="This is the shortest path"
 ))
 
+fig.add_trace(go.Scattermapbox(
+        lat=[latitude[0], latitude[-1]],
+        lon=[longitude[0], longitude[-1]],
+        mode="markers",
+        marker={"size": 13, "color": "black"},
+        name="start and end",
+        showlegend=True,
+        text="This is the start point and the end point"
+))
+
 path, distance, risk = d.safest_path(graph, list(graph.keys())[0], list(graph.keys())[142])
 
 latitude, longitude = get_lat_lon(path)
@@ -97,7 +107,7 @@ fig.add_trace(go.Scattermapbox(
         lon=longitude,
         mode="markers+lines",
         marker={"size": 1},
-        line={"width": 4, "color": "blue"},
+        line={"width": 4, "color": "yellow"},
         name="safest",
         showlegend=True,
         text="This is the safest path"

@@ -4,6 +4,7 @@ import math
 import heapq
 from collections import deque
 import dijkstra
+import draw
 
 
 # This method generates the necessary dictionaries to run dijkstra's algorithm
@@ -149,24 +150,27 @@ def main():
 
     print("Shortest path:")
     time_start = time.time()
-    path, distance, risk = dijkstra.shortest_path(graph, list(graph.keys())[0], list(graph.keys())[142])
+    path, distance, risk = dijkstra.shortest_path(graph, (6.2063927, -75.5686884), list(graph.keys())[142])
 
-    print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
+    print("Distance:", str(round(distance, 2)), "\nHarassment Risk:", str(round(risk / (len(path) - 1), 2)))
     print("Time: ", str(time.time() - time_start), "seconds")
 
     print("Safest path:")
     time_start = time.time()
-    path, distance, risk = dijkstra.safest_path(graph, list(graph.keys())[0], list(graph.keys())[142])
+    path2, distance, risk = dijkstra.safest_path(graph, (6.2063927, -75.5686884), list(graph.keys())[142])
 
-    print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
+    print("Distance:", str(round(distance, 2)), "\nHarassment Risk:", str(round(risk / (len(path) - 1), 2)))
     print("Time: ", str(time.time() - time_start), "seconds")
 
     print("Safe and Short path:")
     time_start = time.time()
-    path, distance, risk = dijkstra.safe_short_path(graph, list(graph.keys())[0], list(graph.keys())[142])
+    path3, distance, risk = dijkstra.safe_short_path(graph, (6.2063927, -75.5686884), list(graph.keys())[142])
 
-    print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
+    print("Distance:", str(round(distance, 2)), "\nHarassment Risk:", str(round(risk / (len(path) - 1), 2)))
     print("Time: ", str(time.time() - time_start), "seconds")
+    print("Generating map...")
+    draw.generate_and_save_map(path, path2, path3)
+
 
 
 main()
