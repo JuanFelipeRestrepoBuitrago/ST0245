@@ -1,112 +1,14 @@
-import time
-from collections import deque
-
+import plotly.express as px
+import plotly.graph_objs as go
 import pandas as pd
-import math
-import heapq
-
-
-# This method finds the vertex of the graph with the lowest distance
-# of all vertexes that are in unvisited
-def find_the_lowest_distance(unvisited: deque, distances: dict):
-    lowest_key = min(unvisited, key=lambda vertex: distances[vertex])
-    unvisited.remove(lowest_key)
-    return lowest_key
-
-
-# def find_the_lowest_distance1(unvisited: deque, distances: dict):
-#     lowest_key = ""
-#     lowest = math.inf
-#
-#     for node in unvisited:
-#         if distances[node][0] < lowest:
-#             lowest_key = node
-#             lowest = distances[node][0]
-#
-#     unvisited.remove(lowest_key)
-#     return lowest_key
-
-
-# This method generates the necessary dictionaries to run dijkstra's algorithm
-def generate_necessary_dictionaries(graph: dict, start_node):
-    distances = dict.fromkeys(graph.keys(), math.inf)
-    risks = dict.fromkeys(graph.keys(), math.inf)
-    unvisited = {}
-    predecessor = dict.fromkeys(graph.keys(), None)
-
-    distances[start_node] = float(0)
-    risks[start_node] = float(0)
-    return distances, risks, unvisited, predecessor
-
-
-# This method generates the path from the start node to the end node
-def generate_path(predecessor, end):
-    path = deque()
-    path.append(end)
-    current = end
-
-    while predecessor[current] is not None:
-        path.appendleft(predecessor[current])
-        current = predecessor[current]
-
-    return list(path)
-
-
-# This method finds the shortest path from a start node to a destination node
-# using Dijkstra's algorithm
-def shortest_path(graph: dict, start, end):
-    distances, risks, visited, predecessor = generate_necessary_dictionaries(graph, start)
-    min_distance = [(float(0), float(0), start)]
-
-    while min_distance:
-        distance, risk, current_node = heapq.heappop(min_distance)
-
-        if current_node == end:
-            break
-        if current_node in visited:
-            continue
-        for adjacent_node in graph[current_node]:
-            if adjacent_node not in visited:
-                adj_dist = distance + graph[current_node][adjacent_node][0]
-                if adj_dist < distances[adjacent_node]:
-                    distances[adjacent_node], risks[adjacent_node] = adj_dist, graph[current_node][
-                        adjacent_node][1] + risk
-                    predecessor[adjacent_node] = current_node
-                    heapq.heappush(min_distance, (adj_dist, risks[adjacent_node], adjacent_node))
-
-    return generate_path(predecessor, end), distances[end], risks[end]
-
-
-def safest_path(graph: dict, start, end):
-    distances, risks, visited, predecessor = generate_necessary_dictionaries(graph, start)
-    min_distance = [(distances[start], distances[start], start)]
-
-    while min_distance:
-        risk, distance, current_node = heapq.heappop(min_distance)
-
-        if current_node == end:
-            break
-        if current_node in visited:
-            continue
-        for adjacent_node in graph[current_node]:
-            if adjacent_node not in visited:
-                adj_risk = risk + graph[current_node][adjacent_node][1]
-                if adj_risk < risks[adjacent_node]:
-                    distances[adjacent_node], risks[adjacent_node] = distance + graph[current_node][
-                        adjacent_node][0], adj_risk
-                    predecessor[adjacent_node] = current_node
-                    heapq.heappush(min_distance, (adj_risk, distances[adjacent_node], adjacent_node))
-
-    return generate_path(predecessor, end), distances[end], risks[end]
-
-
-def safe_short_path(graph: dict, start, end):
-    pass
+import geopandas as gpd
+from shapely import wkt
+import Entrega_2.dijkstra as d
 
 
 def generate_graph():
     # Read the data from the csv file and store it in a pandas dataframe
-    data = pd.read_csv("Entrega_2\calles_de_medellin_con_acoso.csv", sep=";")
+    data = pd.read_csv("Entrega_2/calles_de_medellin_con_acoso.csv", sep=";")
 
     data.harassmentRisk.fillna(data.harassmentRisk.mean(), inplace=True)
 
@@ -144,34 +46,107 @@ def generate_graph():
     return graph
 
 
-def main():
-    graph = generate_graph()
+def get_lat_lon(path):
+    lats = []
+    lons = []
 
-    # print("Functional")
-    # time_start = time.time()
-    # distances, unvisited, predecessor = generate_necessary_dictionaries(graph, list(graph.keys())[2000])
-    # find_the_lowest_distance(unvisited, distances)
-    # print("Time: ", str((time.time() - time_start)), "seconds")
-    #
-    # print("Non-Functional")
-    # time_start = time.time()
-    # distances, unvisited, predecessor = generate_necessary_dictionaries(graph, list(graph.keys())[2000])
-    # find_the_lowest_distance1(unvisited, distances)
-    # print("Time: ", str((time.time() - time_start)), "seconds")
+    for i in path:
+        lats.append(i[0])
+        lons.append(i[1])
 
-    print("Shortest path:")
-    time_start = time.time()
-    path, distance, risk = shortest_path(graph, list(graph.keys())[0], list(graph.keys())[2000])
-
-    print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
-    print("Time: ", str(time.time() - time_start), "seconds")
-
-    print("Safest path:")
-    time_start = time.time()
-    path, distance, risk = safest_path(graph, list(graph.keys())[0], list(graph.keys())[2000])
-
-    print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
-    print("Time: ", str(time.time() - time_start), "seconds")
+    return lats, lons
 
 
-main()
+# load data
+graph = generate_graph()
+path, distance, risk = d.shortest_path(graph, list(graph.keys())[0], list(graph.keys())[142])
+
+area = pd.read_csv('Entrega_2/poligono_de_medellin.csv', sep=';')
+area['geometry'] = area['geometry'].apply(wkt.loads)
+area = gpd.GeoDataFrame(area)
+
+fig = px.choropleth_mapbox(
+    area,
+    geojson=area.geometry,
+    locations=area.index,
+    mapbox_style="carto-darkmatter",
+    zoom=10,
+    center={"lat": float(area.lat), "lon": float(area.lon)},
+    opacity=0.5,
+)
+
+latitude, longitude = get_lat_lon(path)
+
+fig.add_trace(go.Scattermapbox(
+        lat=latitude,
+        lon=longitude,
+        mode="markers+lines",
+        marker={"size": 1},
+        line={"width": 4, "color": "red"},
+        name="shortest",
+        showlegend=True,
+        text="This is the shortest path"
+))
+
+path, distance, risk = d.safest_path(graph, list(graph.keys())[0], list(graph.keys())[142])
+
+latitude, longitude = get_lat_lon(path)
+
+fig.add_trace(go.Scattermapbox(
+        lat=latitude,
+        lon=longitude,
+        mode="markers+lines",
+        marker={"size": 1},
+        line={"width": 4, "color": "blue"},
+        name="safest",
+        showlegend=True,
+        text="This is the safest path"
+))
+
+fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+
+fig.write_html("Entrega_2/map.html", auto_open=True)
+
+
+def generate_paths(path: list, name: str, fig):
+    latitude, longitude = get_lat_lon(path)
+
+    fig.add_trace(go.Scattermapbox(
+        lat=latitude,
+        lon=longitude,
+        mode="markers+lines",
+        marker={"size": 1},
+        line={"width": 4, "color": "red"},
+        name=name
+    ))
+
+
+def generate_and_save_map(shortest: list=None, safest: list=None, safe_short: list=None):
+    # load data
+    area = pd.read_csv('Entrega_2/poligono_de_medellin.csv', sep=';')
+    area['geometry'] = area['geometry'].apply(wkt.loads)
+    area = gpd.GeoDataFrame(area)
+
+    # Create the Medellin map
+    fig = px.choropleth_mapbox(
+        area,
+        geojson=area.geometry,
+        locations=area.index,
+        mapbox_style="carto-darkmatter",
+        zoom=10,
+        center={"lat": float(area.lat), "lon": float(area.lon)},
+        opacity=0.5,
+    )
+
+    # Add the paths to the map
+    if shortest is not None:
+        generate_paths(shortest, "Shortest", fig)
+    if safest is not None:
+        generate_paths(safest, "Safest", fig)
+    if safe_short is not None:
+        generate_paths(safe_short, "Safe and Short", fig)
+
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+
+    fig.write_html("Entrega_2/map.html", auto_open=True)
+

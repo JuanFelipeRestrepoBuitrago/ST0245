@@ -1,12 +1,8 @@
-import time
-import pandas as pd
-import math
 import heapq
+import math
 from collections import deque
-import dijkstra
 
 
-# This method generates the necessary dictionaries to run dijkstra's algorithm
 def generate_necessary_dictionaries(graph: dict, start_node):
     distances = {}
     visited = {}
@@ -102,73 +98,3 @@ def safe_short_path(graph: dict, start, end):
                                                   adjacent_node))
 
     return generate_path(predecessor, end), distances[end][0], distances[end][1]
-
-
-def generate_graph():
-    # Read the data from the csv file and store it in a pandas dataframe
-    data = pd.read_csv("calles_de_medellin_con_acoso.csv", sep=";")
-
-    data.harassmentRisk.fillna(data.harassmentRisk.mean(), inplace=True)
-
-    # Create the graph as a dictionary of dictionaries.
-    # The keys of the first dictionary are the origin and
-    # destination from our dataframe because they both are
-    # points of the graph, where we can go or go back.
-    graph = {}
-
-    # Iterate over the origin and destination columns
-    # of the dataframe and add them to the graph if they
-    # are not already there.
-
-    for i in data.index:
-        origin = tuple(data["origin"][i][1:-1].split(","))
-        destination = tuple(data["destination"][i][1:-1].split(","))
-
-        origin = (float(origin[1]), float(origin[0]))
-        destination = (float(destination[1]), float(destination[0]))
-        weight = (data["length"][i], data["harassmentRisk"][i], (
-                (data["length"][i] + data["harassmentRisk"][i]) / 2
-            ))
-
-        if origin not in graph:
-            graph[origin] = {}
-        # Add the adjacent street of each dictionary in the graph.
-        graph[origin][destination] = weight
-
-        if data["oneway"][i]:
-            if destination not in graph:
-                graph[destination] = {}
-            # Add the adjacent street of each dictionary in the graph.
-            graph[destination][origin] = weight
-
-    return graph
-
-
-def main():
-    graph = generate_graph()
-
-    print("Shortest path:")
-    time_start = time.time()
-    path, distance, risk = dijkstra.shortest_path(graph, list(graph.keys())[0], list(graph.keys())[142])
-
-    print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
-    print("Time: ", str(time.time() - time_start), "seconds")
-
-    print("Safest path:")
-    time_start = time.time()
-    path, distance, risk = dijkstra.safest_path(graph, list(graph.keys())[0], list(graph.keys())[142])
-
-    print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
-    print("Time: ", str(time.time() - time_start), "seconds")
-
-    print("Safe and Short path:")
-    time_start = time.time()
-    path, distance, risk = dijkstra.safe_short_path(graph, list(graph.keys())[0], list(graph.keys())[142])
-
-    print(path, round(distance, 2), round(risk / (len(path) - 1), 2))
-    print("Time: ", str(time.time() - time_start), "seconds")
-
-
-main()
-
-
