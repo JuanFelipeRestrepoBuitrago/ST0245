@@ -53,13 +53,13 @@ def generate_start_and_end_points(path: list, fig):
     ))
 
 
-def generate_and_save_map(shortest: list=None, safest: list=None, safe_short: list=None):
+def generate_and_save_map(shortest: list = None, safest: list = None, safe_short: list = None):
     # load data
     area = pd.read_csv('poligono_de_medellin.csv', sep=';')
     area['geometry'] = area['geometry'].apply(wkt.loads)
     area = gpd.GeoDataFrame(area)
 
-    # Create the Medellin map
+    # Create the Medellín map
     fig = px.choropleth_mapbox(
         area,
         geojson=area.geometry,
