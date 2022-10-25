@@ -29,7 +29,7 @@ def generate_paths(path: list, color: str, name: str, fig):
     ))
 
 
-def generate_start_and_end_points(path: list, fig, start_name="start", end_name="end"):
+def generate_start_and_end_points(path: list, fig, start_name, end_name):
     latitude, longitude = get_lat_lon(path)
 
     fig.add_trace(go.Scattermapbox(
@@ -54,7 +54,7 @@ def generate_start_and_end_points(path: list, fig, start_name="start", end_name=
 
 
 def generate_and_save_map(shortest: list = None, safest: list = None, safe_short: list = None,
-                          start_name="start", end_name="end"):
+                          start_name="Start Point", end_name="End Point"):
     # load data
     area = pd.read_csv('poligono_de_medellin.csv', sep=';')
     area['geometry'] = area['geometry'].apply(wkt.loads)
@@ -71,7 +71,7 @@ def generate_and_save_map(shortest: list = None, safest: list = None, safe_short
         opacity=0.5,
     )
 
-    generate_start_and_end_points(shortest, fig)
+    generate_start_and_end_points(shortest, fig, start_name, end_name)
 
     # Add the paths to the map
     if shortest is not None:
