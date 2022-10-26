@@ -15,12 +15,12 @@ def safe_and_short(start_name="Starting Point", end_name="Destination", distance
 
 def menu_locations():
     print("Choose a starting point and a destination from the following list:")
-    print("1. Universidad EAFIT")
-    print("2. Universidad Nacional")
-    print("3. Universidad de Antioquia")
-    print("4. Universidad de Medellín")
-    print("5. Universidad Pontificia Bolivariana")
-    print("6. Alcaldia de Medellín")
+    print("1. EAFIT University")
+    print("2. National University")
+    print("3. University of Antioquia")
+    print("4. University of Medellín")
+    print("5. Bolivarian Pontifical University")
+    print("6. Medellin's Town Hall")
 
 
 def menu_options():

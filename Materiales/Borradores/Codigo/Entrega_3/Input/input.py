@@ -3,12 +3,12 @@ import time
 from Entrega_3.Output import output
 
 locations = {
-    1: "Universidad EAFIT",
-    2: "Universidad Nacional",
-    3: "Universidad de Antioquia",
-    4: "Universidad de Medellín",
-    5: "Universidad Pontificia Bolivariana",
-    6: "Alcaldia de Medellín"
+    1: "EAFIT University",
+    2: "National University",
+    3: "University of Antioquia",
+    4: "University of Medellín",
+    5: "Bolivarian Pontifical University",
+    6: "Medellin's Town Hall"
 }
 
 
