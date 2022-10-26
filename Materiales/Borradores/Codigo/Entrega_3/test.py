@@ -8,7 +8,7 @@ import time
 
 coordinates = {
     "Universidad EAFIT": (6.20020215, -75.5784848084993),
-    "Universidad Nacional": (6.2623722, -75.5782274),
+    "Universidad Nacional": (6.262208341659632, -75.57724255802084),
     "Universidad de Antioquia": (6.268433089452519, -75.56881234818871),
     "Universidad de Medellín": (6.231640688146965, -75.61005360517099),
     "Alcaldía de Medellín": (6.245199939323498, -75.57369230277732),
