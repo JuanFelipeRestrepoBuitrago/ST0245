@@ -119,6 +119,9 @@ def test_2():
 
     paths = [None, None, None]
     for i in option:
+        if i < 1 or i > 3:
+            continue
+
         start_time = time.time()
         if i == 1:
             path, dist, risk = d.shortest_path(graph, start, end)
@@ -140,8 +143,9 @@ def test_2():
         total_time += end_time - start_time
 
     total_time = total_time / len(option)
-    print("Average Time of ALgorithm: " + str(round(total_time, 2)))
+    print("Average Time of Paths Calculation: " + str(round(total_time, 2)))
     draw.generate_and_save_map(paths[0], paths[1], paths[2], start_name=start_name, end_name=end_name)
+    print("Map generated!")
 
 
 
