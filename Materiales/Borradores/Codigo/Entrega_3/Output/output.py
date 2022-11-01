@@ -20,7 +20,8 @@ def menu_locations():
     print("3. University of Antioquia")
     print("4. University of Medellín")
     print("5. Bolivarian Pontifical University")
-    print("6. Medellin's Town Hall")
+    print("6. Colombian Polytechnic Jaime Isaza Cadavid")
+    print("7. Medellin's Town Hall")
 
 
 def menu_options():

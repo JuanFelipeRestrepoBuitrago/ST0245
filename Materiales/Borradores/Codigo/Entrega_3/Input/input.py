@@ -8,7 +8,8 @@ locations = {
     3: "University of Antioquia",
     4: "University of Medellín",
     5: "Bolivarian Pontifical University",
-    6: "Medellin's Town Hall"
+    6: "Colombian Polytechnic Jaime Isaza Cadavid",
+    7: "Medellin's Town Hall"
 }
 
 

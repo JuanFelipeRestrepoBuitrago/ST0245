@@ -12,7 +12,8 @@ coordinates = {
     "University of Antioquia ": (6.268433089452519, -75.56881234818871),
     "University of Medellín": (6.231640688146965, -75.61005360517099),
     "Medellin's Town Hall": (6.245199939323498, -75.57369230277732),
-    "Bolivarian Pontifical University": (6.242522650239001, -75.58939231551759)
+    "Bolivarian Pontifical University": (6.242522650239001, -75.58939231551759),
+    "Colombian Polytechnic Jaime Isaza Cadavid": (6.21511148484419, -75.57787397550291),
 }
 
 
