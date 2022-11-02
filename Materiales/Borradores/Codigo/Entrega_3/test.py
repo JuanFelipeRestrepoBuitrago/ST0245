@@ -132,12 +132,12 @@ def test_2():
         elif i == 2:
             path, dist, risk = d.safest_path(graph, start, end)
 
-            output.shortest(start_name, end_name, dist, risk, path)
+            output.safest(start_name, end_name, dist, risk, path)
             paths[1] = path
         elif i == 3:
             path, dist, risk = d.safe_short_path(graph, start, end)
 
-            output.shortest(start_name, end_name, dist, risk, path)
+            output.safe_and_short(start_name, end_name, dist, risk, path)
             paths[2] = path
 
         end_time = time.time()

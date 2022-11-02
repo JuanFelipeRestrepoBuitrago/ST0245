@@ -19,7 +19,7 @@ def choose_location():
         option = tuple(map(int, input("Option (Example: start_option,end_option): ").split(",")))
 
         for i in option:
-            if i < 1 or i > 6:
+            if i < 1 or i > 7:
                 raise ValueError()
 
         return locations[option[0]], locations[option[1]]
