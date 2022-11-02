@@ -122,29 +122,42 @@ def test_2():
     for i in option:
         if i < 1 or i > 3:
             continue
+        try:
+            start_time = time.time()
+            if i == 1:
+                path, dist, risk = d.shortest_path(graph, start, end)
+                end_time = time.time()
 
-        start_time = time.time()
-        if i == 1:
-            path, dist, risk = d.shortest_path(graph, start, end)
+                if dist == math.inf or risk == math.inf:
+                    raise NotImplementedError("The Shortest path was not found")
 
-            output.shortest(start_name, end_name, dist, risk, path)
-            paths[0] = path
-        elif i == 2:
-            path, dist, risk = d.safest_path(graph, start, end)
+                output.shortest(start_name, end_name, dist, risk, path)
+                paths[0] = path
+            elif i == 2:
+                path, dist, risk = d.safest_path(graph, start, end)
+                end_time = time.time()
 
-            output.safest(start_name, end_name, dist, risk, path)
-            paths[1] = path
-        elif i == 3:
-            path, dist, risk = d.safe_short_path(graph, start, end)
+                if dist == math.inf or risk == math.inf:
+                    raise NotImplementedError("The Shortest path was not found")
 
-            output.safe_and_short(start_name, end_name, dist, risk, path)
-            paths[2] = path
+                output.safest(start_name, end_name, dist, risk, path)
+                paths[1] = path
+            elif i == 3:
+                path, dist, risk = d.safe_short_path(graph, start, end)
+                end_time = time.time()
 
-        end_time = time.time()
-        total_time += end_time - start_time
+                if dist == math.inf or risk == math.inf:
+                    raise NotImplementedError("The Safe and Short path was not found")
+
+                output.safe_and_short(start_name, end_name, dist, risk, path)
+                paths[2] = path
+            total_time += end_time - start_time
+        except NotImplementedError as e:
+            print(e)
+            time.sleep(1.7)
 
     total_time = total_time / len(option)
-    print("Average Time of Paths Calculation: " + str(round(total_time, 2)))
+    print("Average Time of Paths Calculation: " + str(round(total_time, 2)) + " seconds")
     draw.generate_and_save_map(paths[0], paths[1], paths[2], start_name=start_name, end_name=end_name)
     print("Map generated!")
 

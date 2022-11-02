@@ -1,3 +1,4 @@
+from functools import reduce
 import plotly.express as px
 import plotly.graph_objs as go
 import pandas as pd
@@ -71,7 +72,9 @@ def generate_and_save_map(shortest: list = None, safest: list = None, safe_short
         opacity=0.5,
     )
 
-    generate_start_and_end_points(shortest, fig, start_name, end_name)
+    generate_start_and_end_points(reduce(lambda x, y: x if len(x) < len(y) else y,
+                                         list(filter(lambda x: x is not None, [shortest, safest, safe_short]))), fig,
+                                  start_name, end_name)
 
     # Add the paths to the map
     if shortest is not None:
