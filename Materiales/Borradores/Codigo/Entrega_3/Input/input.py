@@ -31,6 +31,10 @@ def choose_location():
         print("Invalid Option, missing start or end location")
         time.sleep(1.7)
         return choose_location()
+    except TypeError as e:
+        print("Invalid Option, missing start or end location")
+        time.sleep(1.7)
+        return choose_location()
 
 
 def choose_option():
@@ -40,8 +44,9 @@ def choose_option():
 
         if "," in option:
             option = tuple(map(int, option.split(",")))
+
         else:
-            option = (int(option))
+            option = tuple([int(option)])
 
         for i in option:
             if i < 1 or i > 3:
