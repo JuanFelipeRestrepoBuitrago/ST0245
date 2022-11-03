@@ -9,11 +9,11 @@ import time
 coordinates = {
     "EAFIT University": (6.20020215, -75.5784848084993),
     "National University": (6.262208341659632, -75.57724255802084),
-    "University of Antioquia ": (6.268433089452519, -75.56881234818871),
+    "University of Antioquia": (6.268433089452519, -75.56881234818871),
     "University of Medellín": (6.231640688146965, -75.61005360517099),
     "Medellin's Town Hall": (6.245199939323498, -75.57369230277732),
     "Bolivarian Pontifical University": (6.242522650239001, -75.58939231551759),
-    "Colombian Polytechnic Jaime Isaza Cadavid": (6.21511148484419, -75.57787397550291),
+    "Colombian Polytechnic Jaime Isaza Cadavid": (6.21230817633373, -75.57688087351086),
 }
 
 
@@ -46,8 +46,6 @@ def find_nearest_coordinate(point, graph):
     return nearest_coordinate
 
 
-
-
 def generate_graph():
     # Read the data from the csv file and store it in a pandas dataframe
     data = pd.read_csv("calles_de_medellin_con_acoso.csv", sep=";")
@@ -70,9 +68,11 @@ def generate_graph():
 
         origin = (float(origin[1]), float(origin[0]))
         destination = (float(destination[1]), float(destination[0]))
-        weight = (data["length"][i], data["harassmentRisk"][i], (
-                (data["length"][i] + data["harassmentRisk"][i]) / 2
-            ))
+        weight = (data["length"][i], data["harassmentRisk"][i],
+                  (data["length"][i] ** data["harassmentRisk"][i]),
+                  ((data["length"][i] + data["length"][i] ** data["harassmentRisk"][i]) / 2)
+                  )
+
 
         if origin not in graph:
             graph[origin] = {}
@@ -160,6 +160,3 @@ def test_2():
     print("Average Time of Paths Calculation: " + str(round(total_time, 2)) + " seconds")
     draw.generate_and_save_map(paths[0], paths[1], paths[2], start_name=start_name, end_name=end_name)
     print("Map generated!")
-
-
-

@@ -8,10 +8,10 @@ def generate_necessary_dictionaries(graph: dict, start_node):
     visited = {}
     predecessor = {}
     for key in graph.keys():
-        distances[key] = [math.inf, math.inf, math.inf]
+        distances[key] = [math.inf, math.inf, math.inf, math.inf]
         predecessor[key] = None
 
-    distances[start_node] = [float(0), float(0), float(0)]
+    distances[start_node] = [float(0), float(0), float(0), float(0)]
     return distances, visited, predecessor
 
 
@@ -55,29 +55,6 @@ def shortest_path(graph: dict, start, end):
 
 def safest_path(graph: dict, start, end):
     distances, visited, predecessor = generate_necessary_dictionaries(graph, start)
-    min_distance = [(distances[start][1], distances[start][0], start)]
-
-    while min_distance:
-        risk, distance, current_node = heapq.heappop(min_distance)
-
-        if current_node == end:
-            break
-        if current_node in visited:
-            continue
-        for adjacent_node in graph[current_node]:
-            if adjacent_node not in visited:
-                adj_risk = risk + graph[current_node][adjacent_node][1]
-                if adj_risk < distances[adjacent_node][1]:
-                    distances[adjacent_node][0], distances[adjacent_node][1] = distance + graph[current_node][
-                        adjacent_node][0], adj_risk
-                    predecessor[adjacent_node] = current_node
-                    heapq.heappush(min_distance, (adj_risk, distances[adjacent_node][0], adjacent_node))
-
-    return generate_path(predecessor, end), distances[end][0], distances[end][1]
-
-
-def safe_short_path(graph: dict, start, end):
-    distances, visited, predecessor = generate_necessary_dictionaries(graph, start)
     min_distance = [(distances[start][2], distances[start][1], distances[start][0], start)]
 
     while min_distance:
@@ -92,7 +69,31 @@ def safe_short_path(graph: dict, start, end):
                 adj_melted = melted + graph[current_node][adjacent_node][2]
                 if adj_melted < distances[adjacent_node][2]:
                     distances[adjacent_node][0], distances[adjacent_node][1], distances[adjacent_node][2] = distance + \
-                        graph[current_node][adjacent_node][0], risk + graph[current_node][adjacent_node][1], melted
+                        graph[current_node][adjacent_node][0], risk + graph[current_node][adjacent_node][1], adj_melted
+                    predecessor[adjacent_node] = current_node
+                    heapq.heappush(min_distance, (adj_melted, distances[adjacent_node][1], distances[adjacent_node][0],
+                                                  adjacent_node))
+
+    return generate_path(predecessor, end), distances[end][0], distances[end][1]
+
+
+def safe_short_path(graph: dict, start, end):
+    distances, visited, predecessor = generate_necessary_dictionaries(graph, start)
+    min_distance = [(distances[start][3], distances[start][1], distances[start][0], start)]
+
+    while min_distance:
+        melted, risk, distance, current_node = heapq.heappop(min_distance)
+
+        if current_node == end:
+            break
+        if current_node in visited:
+            continue
+        for adjacent_node in graph[current_node]:
+            if adjacent_node not in visited:
+                adj_melted = melted + graph[current_node][adjacent_node][3]
+                if adj_melted < distances[adjacent_node][3]:
+                    distances[adjacent_node][0], distances[adjacent_node][1], distances[adjacent_node][3] = distance + \
+                        graph[current_node][adjacent_node][0], risk + graph[current_node][adjacent_node][1], adj_melted
                     predecessor[adjacent_node] = current_node
                     heapq.heappush(min_distance, (adj_melted, distances[adjacent_node][1], distances[adjacent_node][0],
                                                   adjacent_node))
