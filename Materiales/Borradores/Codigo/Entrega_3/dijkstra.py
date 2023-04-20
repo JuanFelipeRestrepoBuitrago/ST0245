@@ -5,7 +5,7 @@ from collections import deque
 
 def generate_necessary_dictionaries(graph: dict, start_node):
     distances = {}
-    visited = {}
+    visited = set()
     predecessor = {}
     for key in graph.keys():
         distances[key] = [math.inf, math.inf, math.inf, math.inf]
@@ -37,10 +37,10 @@ def shortest_path(graph: dict, start, end):
     while min_distance:
         distance, risk, current_node = heapq.heappop(min_distance)
 
-        if current_node == end:
-            break
         if current_node in visited:
             continue
+        else:
+            visited.add(current_node)
         for adjacent_node in graph[current_node]:
             if adjacent_node not in visited:
                 adj_dist = distance + graph[current_node][adjacent_node][0]
@@ -60,10 +60,10 @@ def safest_path(graph: dict, start, end):
     while min_distance:
         melted, risk, distance, current_node = heapq.heappop(min_distance)
 
-        if current_node == end:
-            break
         if current_node in visited:
             continue
+        else:
+            visited.add(current_node)
         for adjacent_node in graph[current_node]:
             if adjacent_node not in visited:
                 adj_melted = melted + graph[current_node][adjacent_node][2]
@@ -84,10 +84,10 @@ def safe_short_path(graph: dict, start, end):
     while min_distance:
         melted, risk, distance, current_node = heapq.heappop(min_distance)
 
-        if current_node == end:
-            break
         if current_node in visited:
             continue
+        else:
+            visited.add(current_node)
         for adjacent_node in graph[current_node]:
             if adjacent_node not in visited:
                 adj_melted = melted + graph[current_node][adjacent_node][3]

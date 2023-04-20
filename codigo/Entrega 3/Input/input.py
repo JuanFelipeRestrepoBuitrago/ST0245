@@ -1,6 +1,6 @@
 import time
 
-from Entrega_3.Output import output
+from Output import output
 
 locations = {
     1: "EAFIT University",

@@ -146,7 +146,6 @@ def test_2():
                 path, dist, risk = d.safe_short_path(graph, start, end)
                 end_time = time.time()
 
-
                 if dist == math.inf or risk == math.inf:
                     raise NotImplementedError("The Safe and Short path was not found")
 
